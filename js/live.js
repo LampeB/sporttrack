@@ -50,16 +50,20 @@
     el = document.getElementById('live-elapsed');
     if (el) el.textContent = fmtDur(state.duration);
 
-    // Arc de remplissage progressif : 0 → pct% de FCmax
+    // Barre de progression circulaire : chaque zone se remplit jusqu'au BPM courant
     var zone = getZone(state.hr, state.profile);
     var hasHr = state.hr > 0;
     var C = 376.99;
-    var pct = hasHr ? Math.min(1, state.hr / computeFcmax(state.profile)) : 0;
-    var fillArc = document.getElementById('hr-fill-arc');
-    if (fillArc) {
-      fillArc.style.strokeDashoffset = C * (1 - pct);
-      fillArc.style.stroke = zone ? zone.color : 'var(--accent)';
-      fillArc.style.strokeOpacity = hasHr ? '1' : '0';
+    var currentPos = hasHr ? Math.min(1, state.hr / computeFcmax(state.profile)) * C : 0;
+    if (window.CONFIG && CONFIG.zones) {
+      document.querySelectorAll('.zone-fill').forEach(function(arc) {
+        var z = CONFIG.zones.find(function(z) { return String(z.id) === String(arc.dataset.zone); });
+        if (!z) return;
+        var zStart = z.pctMin * C;
+        var zEnd = Math.min(1.0, z.pctMax) * C;
+        var fill = Math.max(0, Math.min(currentPos, zEnd) - zStart);
+        arc.style.strokeDasharray = fill.toFixed(1) + ' ' + C;
+      });
     }
 
     // Badge de zone
