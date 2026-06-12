@@ -4,11 +4,13 @@ window.CONFIG = {
     anonKey: localStorage.getItem('st_supabase_key') || '',
   },
   zones: [
-    { id: 1, name: 'Échauffement',  pctMin: 0.50, pctMax: 0.60, color: 'var(--z1)', dimColor: 'var(--z1-dim)' },
-    { id: 2, name: 'Endurance',     pctMin: 0.60, pctMax: 0.70, color: 'var(--z2)', dimColor: 'var(--z2-dim)' },
-    { id: 3, name: 'Aérobie',       pctMin: 0.70, pctMax: 0.80, color: 'var(--z3)', dimColor: 'var(--z3-dim)' },
-    { id: 4, name: 'Seuil',         pctMin: 0.80, pctMax: 0.90, color: 'var(--z4)', dimColor: 'var(--z4-dim)' },
-    { id: 5, name: 'Maximum',       pctMin: 0.90, pctMax: 1.20, color: 'var(--z5)', dimColor: 'var(--z5-dim)' },
+    { id: 'r', name: 'Repos',        pctMin: 0.00, pctMax: 0.40, color: 'var(--zr)', dimColor: 'var(--zr-dim)' },
+    { id: 'l', name: 'Légère',       pctMin: 0.40, pctMax: 0.50, color: 'var(--zl)', dimColor: 'var(--zl-dim)' },
+    { id: 1,   name: 'Échauffement', pctMin: 0.50, pctMax: 0.60, color: 'var(--z1)', dimColor: 'var(--z1-dim)' },
+    { id: 2,   name: 'Endurance',    pctMin: 0.60, pctMax: 0.70, color: 'var(--z2)', dimColor: 'var(--z2-dim)' },
+    { id: 3,   name: 'Aérobie',      pctMin: 0.70, pctMax: 0.80, color: 'var(--z3)', dimColor: 'var(--z3-dim)' },
+    { id: 4,   name: 'Seuil',        pctMin: 0.80, pctMax: 0.90, color: 'var(--z4)', dimColor: 'var(--z4-dim)' },
+    { id: 5,   name: 'Maximum',      pctMin: 0.90, pctMax: 1.20, color: 'var(--z5)', dimColor: 'var(--z5-dim)' },
   ],
   themes: {
     world: { name: '🗺️ Villes du monde', milestones: [
@@ -126,8 +128,7 @@ window.getZone = function(hr, profile) {
   if (!hr || hr <= 0) return null;
   const max = window.computeFcmax(profile);
   const pct = hr / max;
-  if (pct < CONFIG.zones[0].pctMin) return null;   // below zone 1 → no badge
-  return CONFIG.zones.find(z => pct >= z.pctMin && pct < z.pctMax) || CONFIG.zones[4];
+  return CONFIG.zones.find(z => pct >= z.pctMin && pct < z.pctMax) || CONFIG.zones[CONFIG.zones.length - 1];
 };
 
 // Format helpers (French)
