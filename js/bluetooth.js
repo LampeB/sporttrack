@@ -83,6 +83,23 @@
     onRSC:  function (cb) { this._onRSC = cb; },
     onFTMS: function (cb) { this._onFTMS = cb; },
 
+    // Notifie l'UI dès qu'un état de connexion change
+    _notifyUI: function () {
+      try {
+        if (window.Live && typeof Live._updateBleDots === 'function') Live._updateBleDots();
+      } catch (e) { /* ignore */ }
+    },
+
+    toggleHR: function () {
+      if (this.state.hrConnected) this.disconnectHR();
+      else this.connectHR();
+    },
+
+    toggleTreadmill: function () {
+      if (this.state.treadmillConnected) this.disconnectTreadmill();
+      else this.connectTreadmill();
+    },
+
     _fireHR: function (hr) {
       if (typeof this._onHR === 'function') {
         try { this._onHR(hr); } catch (e) { console.error('[BT] _onHR callback error', e); }
@@ -133,6 +150,7 @@
         device.addEventListener('gattserverdisconnected', function () {
           self.state.hrConnected = false;
           self.state.rscConnected = false;
+          self._notifyUI();
           toast('Capteur cardio déconnecté', 'warning');
           self._fireHR(0);
         });
@@ -147,6 +165,7 @@
           self.parseHR(ev.target.value);
         });
         this.state.hrConnected = true;
+        this._notifyUI();
 
         // Service RSC (optionnel)
         try {
@@ -184,6 +203,7 @@
       this._hrDevice = null;
       this.state.hrConnected = false;
       this.state.rscConnected = false;
+      this._notifyUI();
     },
 
     // -----------------------------------------------------------------------
@@ -207,6 +227,7 @@
           self._ctrlChar = null;
           self.state.treadmillStatus = 'unknown';
           self.state.treadmillStatusLabel = '—';
+          self._notifyUI();
           toast('Tapis déconnecté', 'warning');
           self._fireFTMS();
         });
@@ -291,6 +312,7 @@
         }
 
         this.state.treadmillConnected = true;
+        this._notifyUI();
         toast('Tapis connecté', 'success');
         return true;
       } catch (err) {
@@ -315,6 +337,7 @@
       this.state.controlSupported = false;
       this.state.treadmillStatus = 'unknown';
       this.state.treadmillStatusLabel = '—';
+      this._notifyUI();
     },
 
     // -----------------------------------------------------------------------
