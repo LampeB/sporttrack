@@ -256,7 +256,7 @@
         <div style="display:flex;gap:8px;align-items:center">
           <span style="font-size:13px;color:var(--text-2)">Type :</span>
           <button class="btn btn-ghost session-type-btn active" id="type-treadmill" onclick="Live.setType('treadmill')">🏃 Tapis</button>
-          <button class="btn btn-ghost session-type-btn" id="type-outdoor" onclick="Live.setType('outdoor')">🌿 Outdoor</button>
+          <button class="btn btn-ghost session-type-btn" id="type-outdoor" onclick="Live.setType('outdoor');APP.navigate('outdoor')">🌿 Outdoor</button>
         </div>
         <button class="btn btn-primary btn-lg" id="btn-session" onclick="Live.toggleSession()">▶ Démarrer la séance</button>
       </div>
