@@ -48,16 +48,14 @@
     el = document.getElementById('live-elapsed');
     if (el) el.textContent = fmtDur(state.duration);
 
-    // Anneau FC : arc + couleur de zone
+    // Zone arcs : allumer la zone courante, atténuer les autres
     var zone = getZone(state.hr, state.profile);
-    var arc = document.getElementById('hr-ring-arc');
-    if (arc) {
-      var max = computeFcmax(state.profile);
-      var pct = state.hr ? Math.min(1, state.hr / max) : 0;
-      var circumference = 2 * Math.PI * 60; // r=60
-      arc.style.strokeDashoffset = circumference * (1 - pct);
-      arc.style.stroke = zone ? zone.color : 'var(--accent)';
-    }
+    var hasHr = state.hr > 0;
+    document.querySelectorAll('.zone-arc').forEach(function(arc) {
+      var isActive = hasHr && zone && String(arc.dataset.zone) === String(zone.id);
+      arc.style.strokeOpacity = isActive ? '1' : (hasHr ? '0.15' : '0.12');
+      arc.style.strokeWidth = isActive ? '10' : '8';
+    });
 
     // Badge de zone
     var badge = document.getElementById('live-zone-badge');
