@@ -19,6 +19,8 @@
     }
     Live._updateBleDots();
     if (window.Charts) Charts.initLiveHR('live-hr-chart');
+    // Afficher le bon panneau selon le type courant
+    Live._refreshPanel();
   }
 
   /* ---------- Callback de mise à jour de séance ---------- */
@@ -131,6 +133,12 @@
     var o = document.getElementById('type-outdoor');
     if (t) t.classList.toggle('active', type === 'treadmill');
     if (o) o.classList.toggle('active', type === 'outdoor');
+    Live._refreshPanel();
+  }
+
+  function _refreshPanel() {
+    var panel = document.getElementById('live-treadmill-panel');
+    if (panel) panel.style.display = (window._sessionType === 'treadmill') ? '' : 'none';
   }
 
   /* ---------- Démarrer / Pause / Reprendre ---------- */
@@ -194,6 +202,7 @@
     toggleSession: toggleSession,
     stopSession: stopSession,
     _updateBleDots: _updateBleDots,
-    _onSessionUpdate: _onSessionUpdate
+    _onSessionUpdate: _onSessionUpdate,
+    _refreshPanel: _refreshPanel
   };
 })();
