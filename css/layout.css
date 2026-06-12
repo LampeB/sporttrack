@@ -116,7 +116,7 @@ body {
   }
 
   #main-content {
-    padding: 16px 16px 80px;
+    padding: 16px 16px calc(80px + env(safe-area-inset-bottom, 0px));
     max-width: none;
   }
 }

@@ -2,6 +2,12 @@
 
 /* ===== LIVE ===== */
 
+.session-type-btn.active {
+  background: var(--accent-dim);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
 /* Ring + stats side by side */
 .live-top {
   display: flex;

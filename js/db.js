@@ -105,6 +105,11 @@ window.DB = (function() {
     await sb.from('sessions').delete().eq('id', id);
   }
 
+  async function updateSession(id, fields) {
+    const sb = client(); if (!sb) return;
+    await sb.from('sessions').update(fields).eq('id', id);
+  }
+
   async function getWeeklySessions() {
     const sb = client(); if (!sb) return [];
     const weekAgo = new Date(Date.now() - 7 * 864e5).toISOString();
@@ -119,5 +124,5 @@ window.DB = (function() {
 
   return { reinit, getProfile, saveProfile, getSessions, getSession, saveSession,
            saveSessionPoint, saveBatchPoints, upsertLive, clearLive,
-           getGoals, saveGoal, deleteGoal, deleteSession, getWeeklySessions, getClient };
+           getGoals, saveGoal, deleteGoal, deleteSession, updateSession, getWeeklySessions, getClient };
 })();

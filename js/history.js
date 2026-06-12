@@ -239,7 +239,7 @@
         'placeholder="Ajouter une note…">' + escapeHtml(s.notes || '') + '</textarea>' +
       '<div class="detail-actions">' +
         '<button class="btn btn-primary" onclick="History.saveNotes()">Enregistrer la note</button>' +
-        '<button class="btn btn-secondary" onclick="History.exportCSV(History.getCurrentDetail())">Exporter CSV</button>' +
+        '<button class="btn btn-ghost" onclick="History.exportCSV(History.getCurrentDetail())">Exporter CSV</button>' +
       '</div>';
 
     return '' +
