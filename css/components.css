@@ -31,22 +31,22 @@
   background: var(--bg-2);
   border: 1px solid var(--border-1);
   border-radius: var(--radius);
-  padding: 20px;
+  padding: 12px 14px;
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 3px;
 }
 
 .stat-card .val {
   font-family: var(--font-mono);
-  font-size: clamp(1.8rem, 4vw, 3rem);
+  font-size: clamp(1.3rem, 2.5vw, 2rem);
   font-weight: 700;
   color: var(--text-1);
   line-height: 1;
 }
 
 .stat-card .lbl {
-  font-size: 12px;
+  font-size: 11px;
   color: var(--text-2);
 }
 

@@ -162,10 +162,6 @@
 
     <!-- LIVE SECTION -->
     <section id="section-live" class="app-section active">
-      <div class="section-header">
-        <h2 class="section-title">En direct</h2>
-        <p class="section-subtitle" id="live-subtitle">Connectez un capteur pour démarrer</p>
-      </div>
       <!-- BLE status bar -->
       <div class="ble-status-bar" id="ble-status-bar">
         <div class="ble-device" id="ble-hr-device">
@@ -183,9 +179,10 @@
           <span>Mode démo</span>
           <div class="toggle" id="demo-toggle" onclick="Session.toggleDemo()"></div>
         </div>
+        <span id="live-subtitle" class="live-subtitle-inline">Connectez un capteur pour démarrer</span>
       </div>
-      <!-- HR Ring -->
-      <div class="live-hero">
+      <!-- Ring + stats side by side -->
+      <div class="live-top">
         <div class="hr-ring-wrap" id="hr-ring-wrap">
           <svg width="140" height="140" viewBox="0 0 140 140">
             <!-- C=376.99, gaps=3px, zone arcs start at top (rotate -90) -->
@@ -239,9 +236,8 @@
             <span class="badge badge-accent" id="live-zone-badge" style="margin-top:6px;display:none"></span>
           </div>
         </div>
-      </div>
-      <!-- Live stats grid -->
-      <div class="live-stats-grid card-grid">
+        <!-- Live stats grid (right of ring) -->
+        <div class="live-stats-grid">
         <div class="stat-card">
           <span class="val" id="live-pace">--'--"</span>
           <span class="lbl">Allure /km</span>
@@ -266,9 +262,10 @@
           <span class="val" id="live-elapsed">00:00</span>
           <span class="lbl">Chrono</span>
         </div>
-      </div>
+        </div><!-- end live-stats-grid -->
+      </div><!-- end live-top -->
       <!-- Session controls -->
-      <div style="display:flex;gap:12px;margin-top:24px;justify-content:center;flex-wrap:wrap">
+      <div style="display:flex;gap:8px;margin-top:12px;justify-content:center;flex-wrap:wrap;align-items:center">
         <div style="display:flex;gap:8px;align-items:center">
           <span style="font-size:13px;color:var(--text-2)">Type :</span>
           <button class="btn btn-ghost session-type-btn active" id="type-treadmill" onclick="Live.setType('treadmill')">🏃 Tapis</button>
@@ -277,8 +274,8 @@
         <button class="btn btn-primary btn-lg" id="btn-session" onclick="Live.toggleSession()">▶ Démarrer la séance</button>
       </div>
       <!-- Treadmill inline panel (shown when type = treadmill) -->
-      <div id="live-treadmill-panel" style="margin-top:20px">
-        <div class="card" style="margin-bottom:16px">
+      <div id="live-treadmill-panel" style="margin-top:12px">
+        <div class="card card-sm" style="margin-bottom:10px">
           <div class="speed-display">
             <div><span class="speed-value" id="lt-speed-val">0.0</span> <span class="speed-unit">km/h</span></div>
             <div style="font-size:13px;color:var(--text-2);margin-top:6px">Vitesse cible : <strong id="lt-speed-target">—</strong> km/h</div>
@@ -299,7 +296,7 @@
           </div>
           <div class="status-bar" id="lt-ctrl-status">Connectez le tapis pour commencer</div>
         </div>
-        <div class="card" style="margin-bottom:16px">
+        <div class="card card-sm" style="margin-bottom:10px">
           <div class="card-title">Préréglages rapides</div>
           <div style="display:flex;gap:8px;flex-wrap:wrap">
             <button class="btn btn-ghost" onclick="Treadmill.preset(5,0)">🚶 5 km/h</button>
@@ -312,7 +309,7 @@
         </div>
       </div>
       <!-- Active session banner (shown during session) -->
-      <div id="session-banner" style="display:none;margin-top:20px">
+      <div id="session-banner" style="display:none;margin-top:12px">
         <div class="session-active-banner">
           <div>
             <div style="font-size:12px;color:var(--text-2);margin-bottom:2px">Séance en cours</div>
@@ -322,7 +319,7 @@
         </div>
       </div>
       <!-- Live HR chart -->
-      <div class="card" id="live-hr-chart-card" style="margin-top:20px;display:none">
+      <div class="card" id="live-hr-chart-card" style="margin-top:12px;display:none">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
           <span style="font-size:14px;font-weight:600;color:var(--text-1)">Fréquence cardiaque</span>
           <span id="live-hr-chart-stat" style="font-size:12px;color:var(--text-2)"></span>

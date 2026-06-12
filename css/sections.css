@@ -1,66 +1,88 @@
 /* SportTrack v2 — Per-section styles */
 
 /* ===== LIVE ===== */
-.live-hero {
-  text-align: center;
-  padding: 24px 0;
+
+/* Ring + stats side by side */
+.live-top {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 12px;
 }
 
-.live-hr-ring {
-  margin: 0 auto 24px;
+.live-top .hr-ring-wrap {
+  flex-shrink: 0;
 }
 
 .live-stats-grid {
+  flex: 1;
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 12px;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
 }
 
-@media (min-width: 600px) {
-  .live-stats-grid {
-    grid-template-columns: repeat(4, 1fr);
-  }
+/* Status text inline in BLE bar */
+.live-subtitle-inline {
+  margin-left: auto;
+  font-size: 12px;
+  color: var(--text-2);
+  align-self: center;
+  white-space: nowrap;
 }
 
 .session-active-banner {
   background: var(--accent-dim);
   border: 1px solid var(--accent);
   border-radius: var(--radius);
-  padding: 14px 18px;
+  padding: 10px 14px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 16px;
 }
 
 .session-timer {
   font-family: var(--font-mono);
-  font-size: 2rem;
+  font-size: 1.6rem;
   font-weight: 700;
   color: var(--accent);
 }
 
 .ble-status-bar {
   display: flex;
-  gap: 12px;
+  gap: 8px;
   flex-wrap: wrap;
-  margin-bottom: 20px;
+  margin-bottom: 12px;
+  align-items: center;
 }
 
 .ble-device {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 8px 12px;
+  gap: 6px;
+  padding: 6px 10px;
   background: var(--bg-2);
   border-radius: 8px;
-  font-size: 13px;
+  font-size: 12px;
+}
+
+/* Responsive: stack on narrow screens */
+@media (max-width: 500px) {
+  .live-top {
+    flex-direction: column;
+  }
+  .live-stats-grid {
+    grid-template-columns: repeat(3, 1fr);
+    width: 100%;
+  }
+  .live-subtitle-inline {
+    display: none;
+  }
 }
 
 /* ===== TREADMILL ===== */
 .speed-display {
   text-align: center;
-  margin: 24px 0;
+  margin: 12px 0 8px;
 }
 
 .speed-value {
@@ -80,8 +102,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 16px;
-  margin: 20px 0;
+  gap: 12px;
+  margin: 8px 0;
 }
 
 .speed-btn {
