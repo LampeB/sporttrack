@@ -50,14 +50,17 @@
     el = document.getElementById('live-elapsed');
     if (el) el.textContent = fmtDur(state.duration);
 
-    // Zone arcs : allumer la zone courante, atténuer les autres
+    // Arc de remplissage progressif : 0 → pct% de FCmax
     var zone = getZone(state.hr, state.profile);
     var hasHr = state.hr > 0;
-    document.querySelectorAll('.zone-arc').forEach(function(arc) {
-      var isActive = hasHr && zone && String(arc.dataset.zone) === String(zone.id);
-      arc.style.strokeOpacity = isActive ? '1' : (hasHr ? '0.15' : '0.12');
-      arc.style.strokeWidth = isActive ? '10' : '8';
-    });
+    var C = 376.99;
+    var pct = hasHr ? Math.min(1, state.hr / computeFcmax(state.profile)) : 0;
+    var fillArc = document.getElementById('hr-fill-arc');
+    if (fillArc) {
+      fillArc.style.strokeDashoffset = C * (1 - pct);
+      fillArc.style.stroke = zone ? zone.color : 'var(--accent)';
+      fillArc.style.strokeOpacity = hasHr ? '1' : '0';
+    }
 
     // Badge de zone
     var badge = document.getElementById('live-zone-badge');

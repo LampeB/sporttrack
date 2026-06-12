@@ -224,6 +224,12 @@
               stroke="var(--z5)" stroke-width="8" stroke-linecap="butt"
               stroke-dasharray="34.7 376.99" stroke-dashoffset="-339.3"
               transform="rotate(-90 70 70)" style="stroke-opacity:.12;transition:stroke-opacity .3s,stroke-width .3s"/>
+            <!-- Progressive fill arc: 0 → current HR% -->
+            <circle id="hr-fill-arc" cx="70" cy="70" r="60" fill="none"
+              stroke="var(--zr)" stroke-width="10" stroke-linecap="round"
+              stroke-dasharray="376.99 376.99" stroke-dashoffset="376.99"
+              transform="rotate(-90 70 70)"
+              style="transition:stroke-dashoffset .5s ease,stroke .3s ease;stroke-opacity:0"/>
           </svg>
           <div class="hr-value">
             <span class="hr-bpm" id="live-hr">--</span>
