@@ -454,7 +454,97 @@
   }
 
   /* ============================================================
-     6/7. destroy / destroyAll
+     6. Live HR streaming chart (real-time during session)
+     ============================================================ */
+  function initLiveHR(canvasId) {
+    _destroyIfExists(canvasId);
+    const ctx = _getCtx(canvasId);
+    if (!ctx) return null;
+
+    _charts[canvasId] = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: [],
+        datasets: [{
+          data: [],
+          borderColor: COLORS.accent,
+          borderWidth: 2,
+          backgroundColor: _gradient(ctx, COLORS.accent, 0.3),
+          fill: true,
+          tension: 0.4,
+          pointRadius: 0,
+          pointHitRadius: 10,
+        }],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        animation: false,
+        interaction: { mode: 'index', intersect: false },
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            backgroundColor: 'rgba(20,20,35,0.92)',
+            borderColor: 'rgba(255,255,255,0.1)',
+            borderWidth: 1,
+            padding: 10,
+            displayColors: false,
+            callbacks: {
+              title: items => items[0] ? items[0].label : '',
+              label: item => item.parsed.y + ' bpm',
+            },
+          },
+        },
+        scales: {
+          x: {
+            grid: { display: false },
+            ticks: { maxRotation: 0, maxTicksLimit: 6 },
+          },
+          y: {
+            grid: { color: 'rgba(255,255,255,0.05)' },
+            beginAtZero: false,
+            suggestedMin: 50,
+            suggestedMax: 200,
+            ticks: { stepSize: 20 },
+          },
+        },
+      },
+    });
+    return _charts[canvasId];
+  }
+
+  function pushLiveHR(canvasId, t, hr, zoneColor) {
+    const chart = _charts[canvasId];
+    if (!chart || !hr || hr <= 0) return;
+
+    chart.data.labels.push(_fmtTime(t));
+    chart.data.datasets[0].data.push(hr);
+
+    if (zoneColor) chart.data.datasets[0].borderColor = zoneColor;
+
+    // Adjust Y range dynamically
+    const data = chart.data.datasets[0].data;
+    const minHr = Math.min.apply(null, data);
+    const maxHr = Math.max.apply(null, data);
+    chart.options.scales.y.suggestedMin = Math.max(40, Math.floor((minHr - 10) / 10) * 10);
+    chart.options.scales.y.suggestedMax = Math.ceil((maxHr + 10) / 10) * 10;
+
+    chart.update('none');
+  }
+
+  function clearLiveHR(canvasId) {
+    const chart = _charts[canvasId];
+    if (!chart) return;
+    chart.data.labels = [];
+    chart.data.datasets[0].data = [];
+    chart.data.datasets[0].borderColor = COLORS.accent;
+    chart.options.scales.y.suggestedMin = 50;
+    chart.options.scales.y.suggestedMax = 200;
+    chart.update('none');
+  }
+
+  /* ============================================================
+     7/8. destroy / destroyAll
      ============================================================ */
   function destroy(canvasId) {
     _destroyIfExists(canvasId);
@@ -464,5 +554,5 @@
     Object.keys(_charts).forEach(_destroyIfExists);
   }
 
-  window.Charts = { renderHR, renderSpeed, renderZoneDonut, renderElevation, renderWeekly, destroy, destroyAll };
+  window.Charts = { renderHR, renderSpeed, renderZoneDonut, renderElevation, renderWeekly, initLiveHR, pushLiveHR, clearLiveHR, destroy, destroyAll };
 })();

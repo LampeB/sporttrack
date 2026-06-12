@@ -8,12 +8,17 @@
 
   window._sessionType = 'treadmill';
 
+  var _wasActive = false;
+  var _liveHrMin = null;
+  var _liveHrMax = null;
+
   /* ---------- Initialisation (à l'activation de la section) ---------- */
   function init() {
     if (window.Session && typeof Session.onUpdate === 'function') {
       Session.onUpdate(Live._onSessionUpdate);
     }
     Live._updateBleDots();
+    if (window.Charts) Charts.initLiveHR('live-hr-chart');
   }
 
   /* ---------- Callback de mise à jour de séance ---------- */
@@ -89,6 +94,33 @@
       }
       if (subtitle) subtitle.textContent = 'Connectez un capteur pour démarrer';
     }
+
+    // Live HR chart
+    var chartCard = document.getElementById('live-hr-chart-card');
+    if (window.Charts) {
+      if (state.active) {
+        // Reset chart data at session start
+        if (!_wasActive) {
+          Charts.clearLiveHR('live-hr-chart');
+          _liveHrMin = null;
+          _liveHrMax = null;
+          if (chartCard) chartCard.style.display = '';
+        }
+        if (state.hr > 0) {
+          var zoneColor = zone ? zone.color : null;
+          Charts.pushLiveHR('live-hr-chart', state.duration, state.hr, zoneColor);
+          _liveHrMin = (_liveHrMin === null) ? state.hr : Math.min(_liveHrMin, state.hr);
+          _liveHrMax = (_liveHrMax === null) ? state.hr : Math.max(_liveHrMax, state.hr);
+          var statEl = document.getElementById('live-hr-chart-stat');
+          if (statEl && _liveHrMin !== null) {
+            statEl.textContent = 'min ' + _liveHrMin + ' · max ' + _liveHrMax + ' bpm';
+          }
+        }
+      } else if (_wasActive) {
+        if (chartCard) chartCard.style.display = 'none';
+      }
+    }
+    _wasActive = !!state.active;
 
     // Pastilles BLE
     Live._updateBleDots();
