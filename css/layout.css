@@ -1,0 +1,123 @@
+/* SportTrack v2 — App layout */
+
+body {
+  height: 100vh;
+  overflow: hidden;
+  background: var(--bg-1);
+}
+
+/* App shell — sidebar + content side by side on desktop */
+#app {
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* Sidebar (desktop) */
+#nav-sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  background: var(--bg-0);
+  border-right: 1px solid var(--border-1);
+  padding: 20px 12px;
+  overflow-y: auto;
+}
+
+/* Bottom nav hidden on desktop */
+#nav-bottom {
+  display: none;
+}
+
+/* Main content */
+#main-content {
+  overflow-y: auto;
+  padding: 24px;
+  max-width: 960px;
+  width: 100%;
+}
+
+/* Nav item */
+.nav-item {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: var(--radius-sm);
+  color: var(--text-2);
+  cursor: pointer;
+  transition: color var(--t), background var(--t);
+}
+
+.nav-item:hover {
+  color: var(--text-1);
+}
+
+.nav-item.active {
+  color: var(--accent);
+  background: var(--accent-dim);
+}
+
+.nav-item svg {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+}
+
+.nav-label {
+  font-size: 14px;
+  font-weight: 500;
+}
+
+/* Sections */
+.app-section {
+  display: none;
+}
+
+.app-section.active {
+  display: block;
+}
+
+/* ===== Mobile ===== */
+@media (max-width: 768px) {
+  #app {
+    grid-template-columns: 1fr;
+    grid-template-rows: 1fr auto;
+  }
+
+  #nav-sidebar {
+    display: none;
+  }
+
+  #nav-bottom {
+    display: flex;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background: var(--bg-0);
+    border-top: 1px solid var(--border-1);
+    padding: 8px 0 env(safe-area-inset-bottom);
+    z-index: 100;
+  }
+
+  #nav-bottom .nav-item {
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    flex: 1;
+    padding: 6px;
+    font-size: 11px;
+  }
+
+  #nav-bottom .nav-label {
+    font-size: 11px;
+  }
+
+  #main-content {
+    padding: 16px 16px 80px;
+    max-width: none;
+  }
+}

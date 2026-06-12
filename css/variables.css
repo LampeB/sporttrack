@@ -1,0 +1,107 @@
+/* SportTrack v2 — Design tokens */
+:root {
+  /* Backgrounds */
+  --bg-0: #07070e;
+  --bg-1: #0f0f1a;
+  --bg-2: #161625;
+  --bg-3: #1e1e31;
+
+  /* Borders */
+  --border-1: rgba(255, 255, 255, .07);
+  --border-2: rgba(255, 255, 255, .13);
+
+  /* Text */
+  --text-1: #f2f2ff;
+  --text-2: #8888aa;
+  --text-3: #44445a;
+
+  /* Accent */
+  --accent: #7c6fff;
+  --accent-dim: rgba(124, 111, 255, .15);
+  --accent-glow: rgba(124, 111, 255, .35);
+
+  /* Energy */
+  --energy: #ff6b35;
+  --energy-dim: rgba(255, 107, 53, .15);
+
+  /* Semantic */
+  --green: #22d3a0;
+  --yellow: #fbbf24;
+  --red: #ef4444;
+
+  /* HR zones */
+  --z1: #94a3b8;
+  --z2: #22d3ee;
+  --z3: #22c55e;
+  --z4: #f97316;
+  --z5: #ef4444;
+  --z1-dim: rgba(148, 163, 184, .12);
+  --z2-dim: rgba(34, 211, 238, .12);
+  --z3-dim: rgba(34, 197, 94, .12);
+  --z4-dim: rgba(249, 115, 22, .12);
+  --z5-dim: rgba(239, 68, 68, .12);
+
+  /* Radii */
+  --radius: 12px;
+  --radius-sm: 8px;
+
+  /* Fonts */
+  --font-ui: system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-mono: 'Courier New', 'SF Mono', monospace;
+
+  /* Spacing scale */
+  --sp-1: 4px;
+  --sp-2: 8px;
+  --sp-3: 12px;
+  --sp-4: 16px;
+  --sp-5: 24px;
+  --sp-6: 32px;
+  --sp-8: 48px;
+
+  /* Shadows */
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, .4);
+  --shadow-md: 0 4px 24px rgba(0, 0, 0, .5);
+
+  /* Transitions */
+  --t: 0.18s ease;
+}
+
+/* Light mode — inverted palette */
+body.light {
+  --bg-0: #f4f4fa;
+  --bg-1: #ffffff;
+  --bg-2: #f7f7fc;
+  --bg-3: #ececf5;
+
+  --border-1: rgba(0, 0, 0, .08);
+  --border-2: rgba(0, 0, 0, .15);
+
+  --text-1: #14142a;
+  --text-2: #5a5a78;
+  --text-3: #9a9ab5;
+
+  --accent: #6a5cf5;
+  --accent-dim: rgba(106, 92, 245, .12);
+  --accent-glow: rgba(106, 92, 245, .25);
+
+  --energy: #ea580c;
+  --energy-dim: rgba(234, 88, 12, .12);
+
+  --green: #0d9f78;
+  --yellow: #b45309;
+  --red: #dc2626;
+
+  --z1: #64748b;
+  --z2: #0891b2;
+  --z3: #16a34a;
+  --z4: #ea580c;
+  --z5: #dc2626;
+  --z1-dim: rgba(100, 116, 139, .12);
+  --z2-dim: rgba(8, 145, 178, .12);
+  --z3-dim: rgba(22, 163, 74, .12);
+  --z4-dim: rgba(234, 88, 12, .12);
+  --z5-dim: rgba(220, 38, 38, .12);
+
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, .08);
+  --shadow-md: 0 4px 24px rgba(0, 0, 0, .12);
+}

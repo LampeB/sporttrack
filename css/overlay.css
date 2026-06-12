@@ -1,0 +1,150 @@
+/* SportTrack v2 — OBS overlay styles
+   Transparent page added as Browser Source in OBS.
+   #overlay-root carries a data-style attribute selecting the look. */
+
+body {
+  margin: 0;
+  background: transparent;
+  font-family: system-ui, -apple-system, sans-serif;
+}
+
+.overlay-hidden {
+  display: none;
+}
+
+.ov-val {
+  font-weight: 700;
+}
+
+.ov-lbl {
+  font-size: .7em;
+  opacity: .6;
+  text-transform: uppercase;
+  letter-spacing: .05em;
+}
+
+/* ===== Style: minimal ===== */
+#overlay-root[data-style="minimal"] {
+  position: fixed;
+  top: 60px;
+  left: 16px;
+  background: rgba(0, 0, 0, .72);
+  backdrop-filter: blur(8px);
+  border-radius: 12px;
+  border-left: 3px solid #22d3a0;
+  padding: 14px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 140px;
+  color: white;
+}
+
+.ov-row {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+[data-style="minimal"] .ov-val {
+  font-size: 1.5rem;
+  font-family: 'Courier New', monospace;
+  line-height: 1;
+}
+
+[data-style="minimal"] .ov-lbl {
+  font-size: .65rem;
+}
+
+/* ===== Style: sport-bar ===== */
+#overlay-root[data-style="sport-bar"] {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: rgba(7, 7, 14, .85);
+  backdrop-filter: blur(6px);
+  border-top: 2px solid #22d3a0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 32px;
+  gap: 0;
+  color: white;
+}
+
+[data-style="sport-bar"] .ov-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0 28px;
+  border-right: 1px solid rgba(255, 255, 255, .1);
+}
+
+[data-style="sport-bar"] .ov-item:last-child {
+  border-right: none;
+}
+
+[data-style="sport-bar"] .ov-val {
+  font-size: 1.6rem;
+  font-family: 'Courier New', monospace;
+  line-height: 1;
+}
+
+[data-style="sport-bar"] .ov-lbl {
+  font-size: .6rem;
+  color: rgba(255, 255, 255, .5);
+}
+
+/* ===== Style: neon ===== */
+#overlay-root[data-style="neon"] {
+  position: fixed;
+  top: 60px;
+  left: 16px;
+  background: rgba(0, 0, 0, .8);
+  border-radius: 12px;
+  border: 1px solid rgba(34, 211, 160, .4);
+  padding: 16px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  color: #22d3a0;
+  text-shadow: 0 0 12px rgba(34, 211, 160, .6);
+  min-width: 150px;
+}
+
+[data-style="neon"] .ov-val {
+  font-size: 1.6rem;
+  font-family: 'Courier New', monospace;
+  line-height: 1;
+  text-shadow: 0 0 16px currentColor;
+}
+
+[data-style="neon"] .ov-lbl {
+  font-size: .65rem;
+  opacity: .7;
+}
+
+/* ===== Style: compact ===== */
+#overlay-root[data-style="compact"] {
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  background: rgba(0, 0, 0, .75);
+  border-radius: 8px;
+  padding: 8px 14px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: white;
+  font-size: .85rem;
+}
+
+[data-style="compact"] .ov-sep {
+  opacity: .3;
+}
+
+[data-style="compact"] .ov-val {
+  font-weight: 700;
+  font-family: 'Courier New', monospace;
+}

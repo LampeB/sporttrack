@@ -1,0 +1,398 @@
+/* SportTrack v2 — Per-section styles */
+
+/* ===== LIVE ===== */
+.live-hero {
+  text-align: center;
+  padding: 24px 0;
+}
+
+.live-hr-ring {
+  margin: 0 auto 24px;
+}
+
+.live-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+
+@media (min-width: 600px) {
+  .live-stats-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+.session-active-banner {
+  background: var(--accent-dim);
+  border: 1px solid var(--accent);
+  border-radius: var(--radius);
+  padding: 14px 18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.session-timer {
+  font-family: var(--font-mono);
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--accent);
+}
+
+.ble-status-bar {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+
+.ble-device {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: var(--bg-2);
+  border-radius: 8px;
+  font-size: 13px;
+}
+
+/* ===== TREADMILL ===== */
+.speed-display {
+  text-align: center;
+  margin: 24px 0;
+}
+
+.speed-value {
+  font-family: var(--font-mono);
+  font-size: clamp(3rem, 8vw, 5rem);
+  font-weight: 900;
+  color: var(--text-1);
+  line-height: 1;
+}
+
+.speed-unit {
+  font-size: 16px;
+  color: var(--text-2);
+}
+
+.speed-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  margin: 20px 0;
+}
+
+.speed-btn {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: var(--bg-3);
+  border: 1px solid var(--border-2);
+  font-size: 24px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--t);
+}
+
+.speed-btn:hover {
+  background: var(--bg-2);
+  border-color: var(--accent);
+}
+
+.speed-btn:active {
+  transform: scale(.95);
+}
+
+.speed-slider {
+  width: 100%;
+  accent-color: var(--accent);
+  height: 4px;
+}
+
+.treadmill-action-row {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.incline-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-top: 16px;
+}
+
+.incline-value {
+  font-family: var(--font-mono);
+  font-size: 1.4rem;
+  font-weight: 700;
+}
+
+.status-bar {
+  padding: 10px 14px;
+  background: var(--bg-3);
+  border-radius: 8px;
+  font-size: 13px;
+  color: var(--text-2);
+  margin-top: 12px;
+}
+
+/* ===== OUTDOOR ===== */
+#map {
+  width: 100%;
+  height: 300px;
+  border-radius: var(--radius);
+  overflow: hidden;
+  margin-bottom: 16px;
+}
+
+.gps-accuracy {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+}
+
+.split-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.split-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  background: var(--bg-2);
+  border-radius: 8px;
+}
+
+/* ===== HISTORY ===== */
+.session-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.session-card {
+  background: var(--bg-2);
+  border: 1px solid var(--border-1);
+  border-radius: var(--radius);
+  padding: 16px;
+  cursor: pointer;
+  transition: border-color var(--t);
+}
+
+.session-card:hover {
+  border-color: var(--border-2);
+}
+
+.session-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.session-type-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 10px;
+  border-radius: 99px;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.session-type-badge.treadmill {
+  background: var(--accent-dim);
+  color: var(--accent);
+}
+
+.session-type-badge.outdoor {
+  background: rgba(34, 211, 160, .15);
+  color: var(--green);
+}
+
+.session-card-stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+
+.session-card-stat .val {
+  font-family: var(--font-mono);
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+.session-card-stat .lbl {
+  font-size: 11px;
+  color: var(--text-2);
+}
+
+.session-detail {
+  padding: 0;
+}
+
+.session-detail-back {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  color: var(--text-2);
+  margin-bottom: 20px;
+  font-size: 14px;
+}
+
+.chart-wrap {
+  position: relative;
+  height: 200px;
+  margin-bottom: 20px;
+}
+
+.zone-distribution {
+  display: flex;
+  gap: 4px;
+  border-radius: 6px;
+  overflow: hidden;
+  height: 8px;
+  margin-top: 8px;
+}
+
+.zone-bar {
+  height: 100%;
+  transition: width .5s ease;
+}
+
+/* ===== GOALS ===== */
+.goal-card {
+  background: var(--bg-2);
+  border: 1px solid var(--border-1);
+  border-radius: var(--radius);
+  padding: 20px;
+  margin-bottom: 12px;
+}
+
+.goal-progress-label {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+  margin-bottom: 8px;
+}
+
+.goal-value {
+  font-family: var(--font-mono);
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: var(--accent);
+}
+
+.voyage-card {
+  background: var(--bg-2);
+  border: 1px solid var(--border-1);
+  border-radius: var(--radius);
+  padding: 20px;
+}
+
+.theme-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.theme-pill {
+  padding: 6px 14px;
+  border-radius: 99px;
+  background: var(--bg-3);
+  border: 1px solid var(--border-2);
+  font-size: 13px;
+  cursor: pointer;
+  transition: all var(--t);
+}
+
+.theme-pill.active {
+  background: var(--accent-dim);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.voyage-total {
+  font-family: var(--font-mono);
+  font-size: 2.4rem;
+  font-weight: 800;
+  color: var(--accent);
+}
+
+.voyage-route {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin: 16px 0;
+  flex-wrap: wrap;
+}
+
+.voyage-city {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.voyage-bar-wrap {
+  flex: 1;
+  min-width: 120px;
+}
+
+.voyage-reached {
+  margin-top: 16px;
+  font-size: 13px;
+  color: var(--text-2);
+  line-height: 1.7;
+}
+
+/* ===== SETTINGS ===== */
+.settings-group {
+  margin-bottom: 32px;
+}
+
+.settings-group-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-3);
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  margin-bottom: 16px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border-1);
+}
+
+.profile-avatar {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: var(--accent-dim);
+  border: 2px solid var(--accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+  margin-bottom: 16px;
+}
+
+.overlay-url-box {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  padding: 10px 14px;
+  background: var(--bg-3);
+  border-radius: var(--radius-sm);
+  font-size: 12px;
+  font-family: var(--font-mono);
+  word-break: break-all;
+  color: var(--text-2);
+}

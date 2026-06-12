@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>SportTrack Overlay</title>
+  <link rel="stylesheet" href="css/overlay.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script defer src="js/config.js"></script>
+  <script defer src="js/overlay.js"></script>
+</head>
+<body>
+<div id="overlay-root" data-style="minimal">
+  <!-- style="minimal" default, overridden by JS from URL params -->
+  <div class="ov-item ov-hr">
+    <div class="ov-val" id="ov-hr">--</div>
+    <div class="ov-lbl">bpm</div>
+  </div>
+  <div class="ov-item ov-pace">
+    <div class="ov-val" id="ov-pace">--'--"</div>
+    <div class="ov-lbl">allure</div>
+  </div>
+  <div class="ov-item ov-dist">
+    <div class="ov-val" id="ov-dist">0.00</div>
+    <div class="ov-lbl">km</div>
+  </div>
+  <div class="ov-item ov-time">
+    <div class="ov-val" id="ov-time">00:00</div>
+    <div class="ov-lbl">temps</div>
+  </div>
+  <div class="ov-item ov-cad">
+    <div class="ov-val" id="ov-cad">--</div>
+    <div class="ov-lbl">pas/min</div>
+  </div>
+  <!-- sport-bar uses .ov-sep between items -->
+  <span class="ov-sep" style="display:none"> | </span>
+</div>
+</body>
+</html>

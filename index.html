@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#07070e">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <title>SportTrack</title>
+  <link rel="manifest" href="manifest.json">
+  <!-- CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+  <link rel="stylesheet" href="css/variables.css">
+  <link rel="stylesheet" href="css/reset.css">
+  <link rel="stylesheet" href="css/layout.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/sections.css">
+  <!-- CDN JS -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js"></script>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <!-- App JS (deferred, in dependency order) -->
+  <script defer src="js/config.js"></script>
+  <script defer src="js/db.js"></script>
+  <script defer src="js/auth.js"></script>
+  <script defer src="js/bluetooth.js"></script>
+  <script defer src="js/gps.js"></script>
+  <script defer src="js/session.js"></script>
+  <script defer src="js/charts.js"></script>
+  <script defer src="js/live.js"></script>
+  <script defer src="js/treadmill.js"></script>
+  <script defer src="js/history.js"></script>
+  <script defer src="js/goals.js"></script>
+  <script defer src="js/settings.js"></script>
+  <script defer src="js/app.js"></script>
+</head>
+<body id="app-body">
+
+<!-- AUTH SCREEN (shown when logged out) -->
+<div id="auth-screen">
+  <div class="auth-card">
+    <div class="auth-logo">🏃</div>
+    <h1 class="auth-title">SportTrack</h1>
+    <p class="auth-subtitle">Connectez-vous pour accéder à vos données</p>
+    <form id="auth-form" onsubmit="Auth.handleLogin(event)">
+      <div class="form-group">
+        <label class="label" for="auth-email">Adresse e-mail</label>
+        <input class="input" type="email" id="auth-email" required placeholder="vous@exemple.com">
+      </div>
+      <div class="form-group">
+        <label class="label" for="auth-password">Mot de passe</label>
+        <input class="input" type="password" id="auth-password" required placeholder="••••••••">
+      </div>
+      <div id="auth-error" class="auth-error" style="display:none"></div>
+      <button class="btn btn-primary btn-lg" type="submit" id="auth-submit" style="width:100%">
+        <span id="auth-btn-text">Se connecter</span>
+        <span id="auth-spinner" class="spinner" style="display:none"></span>
+      </button>
+    </form>
+    <!-- Supabase first-run config (shown when not configured) -->
+    <div id="auth-supabase-config" style="display:none;margin-top:20px;border-top:1px solid var(--border-1);padding-top:20px">
+      <p style="font-size:13px;color:var(--text-2);margin-bottom:14px;text-align:center">⚙️ Configuration Supabase requise</p>
+      <div class="form-group">
+        <label class="label" for="sb-url-input">URL du projet Supabase</label>
+        <input class="input" type="url" id="sb-url-input" placeholder="https://xxxx.supabase.co">
+      </div>
+      <div class="form-group">
+        <label class="label" for="sb-key-input">Clé anon (publique)</label>
+        <input class="input" type="text" id="sb-key-input" placeholder="eyJ...">
+      </div>
+      <button class="btn btn-ghost" onclick="APP.saveSupabaseConfig()" style="width:100%">Enregistrer la configuration</button>
+    </div>
+    <p class="auth-hint">Besoin d'aide ? Consultez le <a href="README.md" style="color:var(--accent)">README</a>.</p>
+  </div>
+</div>
+
+<style>
+#auth-screen { position:fixed;inset:0;background:var(--bg-1);display:flex;align-items:center;justify-content:center;z-index:9000;padding:20px }
+.auth-card { background:var(--bg-2);border:1px solid var(--border-1);border-radius:16px;padding:40px 36px;width:100%;max-width:400px }
+.auth-logo { font-size:40px;text-align:center;margin-bottom:12px }
+.auth-title { font-size:28px;font-weight:800;color:var(--text-1);text-align:center;margin-bottom:6px }
+.auth-subtitle { font-size:14px;color:var(--text-2);text-align:center;margin-bottom:28px }
+.auth-error { background:rgba(239,68,68,.15);border:1px solid var(--red);border-radius:8px;padding:10px 14px;font-size:13px;color:var(--red);margin-bottom:16px }
+.auth-hint { font-size:12px;color:var(--text-3);text-align:center;margin-top:20px;line-height:1.6 }
+.auth-hint code { background:var(--bg-3);padding:1px 5px;border-radius:4px;font-family:monospace }
+</style>
+
+<!-- MAIN APP (hidden until authenticated) -->
+<div id="app" style="display:none">
+
+  <!-- SIDEBAR NAV (desktop) -->
+  <nav id="nav-sidebar">
+    <div class="nav-brand">
+      <span class="nav-brand-icon">🏃</span>
+      <span class="nav-brand-name">SportTrack</span>
+    </div>
+    <div class="nav-items">
+      <div class="nav-item active" data-section="live" onclick="APP.navigate('live')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        <span class="nav-label">En direct</span>
+      </div>
+      <div class="nav-item" data-section="treadmill" onclick="APP.navigate('treadmill')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h4l3-9 4 18 3-9h4"/></svg>
+        <span class="nav-label">Tapis roulant</span>
+      </div>
+      <div class="nav-item" data-section="outdoor" onclick="APP.navigate('outdoor')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 17l4-8 4 4 4-8 4 8"/><path d="M3 21h18"/></svg>
+        <span class="nav-label">Course outdoor</span>
+      </div>
+      <div class="nav-item" data-section="history" onclick="APP.navigate('history')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>
+        <span class="nav-label">Historique</span>
+      </div>
+      <div class="nav-item" data-section="goals" onclick="APP.navigate('goals')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
+        <span class="nav-label">Objectifs</span>
+      </div>
+      <div class="nav-item" data-section="settings" onclick="APP.navigate('settings')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        <span class="nav-label">Paramètres</span>
+      </div>
+    </div>
+    <div class="nav-footer">
+      <div class="nav-user" id="nav-user-info"></div>
+      <button class="btn btn-ghost" onclick="Auth.logout()" style="width:100%;margin-top:8px;font-size:13px">Déconnexion</button>
+    </div>
+    <style>
+    .nav-brand{display:flex;align-items:center;gap:10px;padding:4px 12px 20px;border-bottom:1px solid var(--border-1);margin-bottom:12px}
+    .nav-brand-icon{font-size:22px}
+    .nav-brand-name{font-size:16px;font-weight:800;color:var(--text-1)}
+    .nav-items{flex:1;display:flex;flex-direction:column;gap:2px}
+    .nav-footer{border-top:1px solid var(--border-1);padding-top:12px;margin-top:auto}
+    .nav-user{font-size:12px;color:var(--text-3);padding:0 12px;word-break:break-all}
+    </style>
+  </nav>
+
+  <!-- BOTTOM NAV (mobile) -->
+  <nav id="nav-bottom">
+    <div class="nav-item active" data-section="live" onclick="APP.navigate('live')">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+      <span>Direct</span>
+    </div>
+    <div class="nav-item" data-section="treadmill" onclick="APP.navigate('treadmill')">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h4l3-9 4 18 3-9h4"/></svg>
+      <span>Tapis</span>
+    </div>
+    <div class="nav-item" data-section="outdoor" onclick="APP.navigate('outdoor')">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 17l4-8 4 4 4-8 4 8"/><path d="M3 21h18"/></svg>
+      <span>Outdoor</span>
+    </div>
+    <div class="nav-item" data-section="history" onclick="APP.navigate('history')">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4"/></svg>
+      <span>Historique</span>
+    </div>
+    <div class="nav-item" data-section="goals" onclick="APP.navigate('goals')">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
+      <span>Objectifs</span>
+    </div>
+  </nav>
+
+  <!-- MAIN CONTENT -->
+  <main id="main-content">
+
+    <!-- LIVE SECTION -->
+    <section id="section-live" class="app-section active">
+      <div class="section-header">
+        <h2 class="section-title">En direct</h2>
+        <p class="section-subtitle" id="live-subtitle">Connectez un capteur pour démarrer</p>
+      </div>
+      <!-- BLE status bar -->
+      <div class="ble-status-bar" id="ble-status-bar">
+        <div class="ble-device" id="ble-hr-device">
+          <span class="ble-dot" id="ble-hr-dot"></span>
+          <span id="ble-hr-label">Cardio</span>
+          <button class="btn btn-ghost" style="padding:4px 10px;font-size:12px" id="btn-connect-hr" onclick="BT.connectHR()">Connecter</button>
+        </div>
+        <div class="ble-device" id="ble-treadmill-device">
+          <span class="ble-dot" id="ble-treadmill-dot"></span>
+          <span id="ble-treadmill-label">Tapis roulant</span>
+          <button class="btn btn-ghost" style="padding:4px 10px;font-size:12px" id="btn-connect-treadmill" onclick="BT.connectTreadmill()">Connecter</button>
+        </div>
+        <div class="ble-device">
+          <span class="ble-dot" id="ble-demo-dot"></span>
+          <span>Mode démo</span>
+          <div class="toggle" id="demo-toggle" onclick="Session.toggleDemo()"></div>
+        </div>
+      </div>
+      <!-- HR Ring -->
+      <div class="live-hero">
+        <div class="hr-ring-wrap" id="hr-ring-wrap">
+          <svg width="140" height="140" viewBox="0 0 140 140">
+            <circle cx="70" cy="70" r="60" fill="none" stroke="var(--border-1)" stroke-width="8"/>
+            <circle id="hr-ring-arc" cx="70" cy="70" r="60" fill="none" stroke="var(--accent)" stroke-width="8"
+              stroke-dasharray="377" stroke-dashoffset="377" stroke-linecap="round"
+              transform="rotate(-90 70 70)" style="transition:stroke-dashoffset .6s ease,stroke .4s ease"/>
+          </svg>
+          <div class="hr-value">
+            <span class="hr-bpm" id="live-hr">--</span>
+            <span class="hr-label">bpm</span>
+            <span class="badge badge-accent" id="live-zone-badge" style="margin-top:6px;display:none"></span>
+          </div>
+        </div>
+      </div>
+      <!-- Live stats grid -->
+      <div class="live-stats-grid card-grid">
+        <div class="stat-card">
+          <span class="val" id="live-pace">--'--"</span>
+          <span class="lbl">Allure /km</span>
+        </div>
+        <div class="stat-card">
+          <span class="val" id="live-speed">0.0</span>
+          <span class="lbl">km/h</span>
+        </div>
+        <div class="stat-card">
+          <span class="val" id="live-dist">0.00</span>
+          <span class="lbl">km</span>
+        </div>
+        <div class="stat-card">
+          <span class="val" id="live-cadence">0</span>
+          <span class="lbl">pas/min</span>
+        </div>
+        <div class="stat-card">
+          <span class="val" id="live-calories">0</span>
+          <span class="lbl">kcal</span>
+        </div>
+        <div class="stat-card">
+          <span class="val" id="live-elapsed">00:00</span>
+          <span class="lbl">Chrono</span>
+        </div>
+      </div>
+      <!-- Session controls -->
+      <div style="display:flex;gap:12px;margin-top:24px;justify-content:center;flex-wrap:wrap">
+        <div style="display:flex;gap:8px;align-items:center">
+          <span style="font-size:13px;color:var(--text-2)">Type :</span>
+          <button class="btn btn-ghost session-type-btn active" id="type-treadmill" onclick="Live.setType('treadmill')">🏃 Tapis</button>
+          <button class="btn btn-ghost session-type-btn" id="type-outdoor" onclick="Live.setType('outdoor')">🌿 Outdoor</button>
+        </div>
+        <button class="btn btn-primary btn-lg" id="btn-session" onclick="Live.toggleSession()">▶ Démarrer la séance</button>
+      </div>
+      <!-- Active session banner (shown during session) -->
+      <div id="session-banner" style="display:none;margin-top:20px">
+        <div class="session-active-banner">
+          <div>
+            <div style="font-size:12px;color:var(--text-2);margin-bottom:2px">Séance en cours</div>
+            <div class="session-timer" id="session-timer-display">00:00:00</div>
+          </div>
+          <button class="btn btn-danger" onclick="Live.stopSession()">■ Terminer</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- TREADMILL SECTION -->
+    <section id="section-treadmill" class="app-section">
+      <div class="section-header">
+        <h2 class="section-title">Tapis roulant</h2>
+        <p class="section-subtitle" id="treadmill-status-text">Non connecté</p>
+      </div>
+      <div class="card" style="margin-bottom:16px">
+        <div class="speed-display">
+          <div><span class="speed-value" id="t-speed-val">0.0</span> <span class="speed-unit">km/h</span></div>
+          <div style="font-size:13px;color:var(--text-2);margin-top:6px">Vitesse cible : <strong id="t-speed-target">—</strong> km/h</div>
+        </div>
+        <div class="speed-controls">
+          <button class="speed-btn" onclick="Treadmill.adjustSpeed(-1)" title="-1 km/h">-1</button>
+          <button class="speed-btn" onclick="Treadmill.adjustSpeed(-0.5)" title="-0.5 km/h">-½</button>
+          <button class="speed-btn btn-primary" style="width:72px;height:72px;font-size:28px" id="btn-treadmill-startstop" onclick="Treadmill.toggleStartStop()">▶</button>
+          <button class="speed-btn" onclick="Treadmill.adjustSpeed(+0.5)" title="+0.5 km/h">+½</button>
+          <button class="speed-btn" onclick="Treadmill.adjustSpeed(+1)" title="+1 km/h">+1</button>
+        </div>
+        <input type="range" class="speed-slider" id="t-speed-slider" min="1" max="20" step="0.5" value="8" oninput="Treadmill.onSlider(this.value)">
+        <div class="incline-row">
+          <span style="font-size:13px;color:var(--text-2)">Inclinaison :</span>
+          <button class="btn btn-ghost" style="padding:6px 12px" onclick="Treadmill.adjustIncline(-0.5)">-</button>
+          <span class="incline-value" id="t-incline-val">0.0</span><span style="font-size:13px;color:var(--text-2)">%</span>
+          <button class="btn btn-ghost" style="padding:6px 12px" onclick="Treadmill.adjustIncline(+0.5)">+</button>
+        </div>
+        <div class="status-bar" id="t-ctrl-status">Connectez le tapis pour commencer</div>
+      </div>
+      <!-- Quick presets -->
+      <div class="card">
+        <div class="card-title">Préréglages rapides</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button class="btn btn-ghost" onclick="Treadmill.preset(5,0)">🚶 5 km/h</button>
+          <button class="btn btn-ghost" onclick="Treadmill.preset(8,0)">🏃 8 km/h</button>
+          <button class="btn btn-ghost" onclick="Treadmill.preset(10,0)">💨 10 km/h</button>
+          <button class="btn btn-ghost" onclick="Treadmill.preset(12,0)">⚡ 12 km/h</button>
+          <button class="btn btn-ghost" onclick="Treadmill.preset(6,2)">⛰️ 6km/h +2%</button>
+          <button class="btn btn-ghost" onclick="Treadmill.preset(8,5)">🏔️ 8km/h +5%</button>
+        </div>
+      </div>
+      <!-- Live treadmill metrics -->
+      <div class="card-grid" style="margin-top:16px">
+        <div class="stat-card"><span class="val" id="t-dist">0.00</span><span class="lbl">km total tapis</span></div>
+        <div class="stat-card"><span class="val" id="t-elapsed">00:00</span><span class="lbl">Temps tapis</span></div>
+        <div class="stat-card"><span class="val" id="t-status-label">—</span><span class="lbl">État tapis</span></div>
+        <div class="stat-card"><span class="val" id="t-hr">--</span><span class="lbl">FC (bpm)</span></div>
+      </div>
+    </section>
+
+    <!-- OUTDOOR SECTION -->
+    <section id="section-outdoor" class="app-section">
+      <div class="section-header">
+        <h2 class="section-title">Course outdoor</h2>
+        <p class="section-subtitle">Suivi GPS en temps réel</p>
+      </div>
+      <div id="map"></div>
+      <div class="gps-accuracy" id="gps-accuracy-row" style="margin-bottom:16px">
+        <span class="ble-dot" id="gps-dot"></span>
+        <span id="gps-accuracy-label">GPS inactif</span>
+      </div>
+      <div class="card-grid" style="margin-bottom:16px">
+        <div class="stat-card"><span class="val" id="gps-dist">0.00</span><span class="lbl">km</span></div>
+        <div class="stat-card"><span class="val" id="gps-pace">--'--"</span><span class="lbl">Allure</span></div>
+        <div class="stat-card"><span class="val" id="gps-speed">0.0</span><span class="lbl">km/h</span></div>
+        <div class="stat-card"><span class="val" id="gps-elevation">--</span><span class="lbl">Altitude (m)</span></div>
+      </div>
+      <div style="margin-bottom:16px">
+        <div class="card-title">Splits (km)</div>
+        <div class="split-list" id="split-list"><div class="empty-state" style="padding:20px;font-size:13px">Les splits apparaîtront au fil de votre course</div></div>
+      </div>
+    </section>
+
+    <!-- HISTORY SECTION -->
+    <section id="section-history" class="app-section">
+      <div id="history-list-view">
+        <div class="section-header" style="display:flex;align-items:center;justify-content:space-between">
+          <div>
+            <h2 class="section-title">Historique</h2>
+            <p class="section-subtitle" id="history-count">Chargement…</p>
+          </div>
+          <button class="btn btn-ghost" onclick="History.load()">↻ Actualiser</button>
+        </div>
+        <!-- Weekly summary chart -->
+        <div class="card" style="margin-bottom:16px">
+          <div class="card-title">Cette semaine</div>
+          <div style="position:relative;height:120px"><canvas id="chart-weekly"></canvas></div>
+        </div>
+        <!-- Session list -->
+        <div class="session-list" id="session-list">
+          <div class="empty-state">Aucune séance enregistrée</div>
+        </div>
+        <div id="history-load-more" style="text-align:center;margin-top:16px;display:none">
+          <button class="btn btn-ghost" onclick="History.loadMore()">Charger plus</button>
+        </div>
+      </div>
+      <!-- Session detail (hidden until a session is clicked) -->
+      <div id="history-detail-view" style="display:none">
+        <div class="session-detail-back" onclick="History.closeDetail()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+          Retour à l'historique
+        </div>
+        <div id="history-detail-content"></div>
+      </div>
+    </section>
+
+    <!-- GOALS SECTION -->
+    <section id="section-goals" class="app-section">
+      <div class="section-header">
+        <h2 class="section-title">Objectifs</h2>
+      </div>
+      <div class="tabs">
+        <div class="tab active" onclick="Goals.showTab('goals')" id="tab-goals">Objectifs</div>
+        <div class="tab" onclick="Goals.showTab('voyage')" id="tab-voyage">🗺️ Voyage</div>
+      </div>
+      <!-- Goals tab -->
+      <div id="goals-tab-content">
+        <div id="goals-list"></div>
+        <button class="btn btn-ghost" onclick="Goals.showAddGoal()" style="margin-top:12px">+ Ajouter un objectif</button>
+        <div id="add-goal-form" style="display:none;margin-top:16px">
+          <div class="card">
+            <div class="card-title">Nouvel objectif</div>
+            <div class="form-group">
+              <label class="label">Type</label>
+              <select class="input" id="goal-type-select">
+                <option value="weekly_distance">Distance hebdomadaire (km)</option>
+                <option value="weekly_duration">Durée hebdomadaire (min)</option>
+                <option value="weekly_sessions">Nombre de séances / semaine</option>
+                <option value="daily_steps">Pas quotidiens</option>
+                <option value="session_distance">Distance par séance (km)</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="label" id="goal-target-label">Cible</label>
+              <input class="input" type="number" id="goal-target-input" min="1" step="1" value="30">
+            </div>
+            <div style="display:flex;gap:8px">
+              <button class="btn btn-primary" onclick="Goals.saveGoal()">Enregistrer</button>
+              <button class="btn btn-ghost" onclick="Goals.hideAddGoal()">Annuler</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Voyage tab -->
+      <div id="voyage-tab-content" style="display:none">
+        <div class="voyage-card">
+          <div class="theme-pills" id="theme-pills"></div>
+          <div class="voyage-total" id="voyage-total-km">0,00</div>
+          <div style="font-size:13px;color:var(--text-2);margin-bottom:12px">km parcourus au total</div>
+          <div class="voyage-route" id="voyage-route">
+            <span class="voyage-city" id="voyage-from">—</span>
+            <div class="voyage-bar-wrap">
+              <div class="progress-wrap"><div class="progress-fill" id="voyage-bar" style="width:0%"></div></div>
+              <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text-3);margin-top:4px">
+                <span id="voyage-pct">0%</span>
+                <span id="voyage-remaining">— km</span>
+              </div>
+            </div>
+            <span class="voyage-city" id="voyage-to" style="color:var(--text-1)">—</span>
+          </div>
+          <div class="voyage-reached" id="voyage-reached"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SETTINGS SECTION -->
+    <section id="section-settings" class="app-section">
+      <div class="section-header">
+        <h2 class="section-title">Paramètres</h2>
+      </div>
+      <!-- Profile -->
+      <div class="settings-group">
+        <div class="settings-group-title">Profil</div>
+        <div id="profile-avatar" class="profile-avatar">🏃</div>
+        <div class="card">
+          <div class="form-group"><label class="label">Nom</label><input class="input" type="text" id="prof-name" placeholder="Mon profil"></div>
+          <div class="form-group"><label class="label">Année de naissance</label><input class="input" type="number" id="prof-birth-year" min="1930" max="2010" placeholder="1990"></div>
+          <div class="form-group">
+            <label class="label">Sexe</label>
+            <select class="input" id="prof-sex"><option value="male">Homme</option><option value="female">Femme</option></select>
+          </div>
+          <div class="form-group"><label class="label">Poids (kg)</label><input class="input" type="number" id="prof-weight" min="30" max="250" step="0.5" placeholder="70"></div>
+          <div class="form-group"><label class="label">Taille (cm)</label><input class="input" type="number" id="prof-height" min="100" max="250" placeholder="175"></div>
+          <button class="btn btn-primary" onclick="Settings.saveProfile()">Enregistrer le profil</button>
+        </div>
+      </div>
+      <!-- Zones calculated -->
+      <div class="settings-group">
+        <div class="settings-group-title">Zones de fréquence cardiaque</div>
+        <div id="zones-display" class="card-grid"></div>
+      </div>
+      <!-- OBS Overlay -->
+      <div class="settings-group">
+        <div class="settings-group-title">Overlay OBS</div>
+        <div class="card">
+          <p style="font-size:13px;color:var(--text-2);margin-bottom:12px">Ajoutez cette URL comme source Navigateur dans OBS :</p>
+          <div style="display:flex;gap:8px;align-items:center;margin-bottom:12px">
+            <label class="label" style="margin:0;white-space:nowrap">Style :</label>
+            <select class="input" id="overlay-style-select" onchange="Settings.updateOverlayUrl()">
+              <option value="minimal">Minimal (sidebar)</option>
+              <option value="sport-bar">Sport bar (bas de page)</option>
+              <option value="neon">Néon (sidebar)</option>
+              <option value="compact">Compact (coin haut-droit)</option>
+            </select>
+          </div>
+          <div class="overlay-url-box">
+            <span id="overlay-url-text" style="flex:1">—</span>
+            <button class="btn btn-ghost" style="padding:6px 10px;font-size:12px;flex-shrink:0" onclick="Settings.copyOverlayUrl()">Copier</button>
+          </div>
+        </div>
+      </div>
+      <!-- Appearance -->
+      <div class="settings-group">
+        <div class="settings-group-title">Apparence</div>
+        <div class="toggle-wrap">
+          <span style="font-size:14px;color:var(--text-1)">Mode clair</span>
+          <div class="toggle" id="theme-toggle" onclick="APP.toggleTheme()"></div>
+        </div>
+      </div>
+      <!-- About -->
+      <div class="settings-group">
+        <div class="settings-group-title">À propos</div>
+        <div style="font-size:13px;color:var(--text-2);line-height:1.7">
+          <p>SportTrack v2 — Suivi de performances running</p>
+          <p>Tapis roulant (BLE/FTMS), course outdoor (GPS), overlay OBS.</p>
+          <p id="settings-user-info"></p>
+        </div>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<!-- Toast container -->
+<div id="toast-container"></div>
+
+</body>
+</html>

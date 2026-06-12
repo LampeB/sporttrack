@@ -1,0 +1,13 @@
+{
+  "name": "SportTrack",
+  "short_name": "SportTrack",
+  "description": "Suivi de séances running — tapis roulant & course outdoor",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#07070e",
+  "theme_color": "#0f0f1a",
+  "orientation": "portrait-primary",
+  "icons": [
+    { "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏃</text></svg>", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ]
+}

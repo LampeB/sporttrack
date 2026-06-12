@@ -1,0 +1,169 @@
+/* ============================================================
+   SportTrack v2 — live.js
+   Contrôle la section "En direct" (#section-live).
+   Expose window.Live
+   ============================================================ */
+(function () {
+  'use strict';
+
+  window._sessionType = 'treadmill';
+
+  /* ---------- Initialisation (à l'activation de la section) ---------- */
+  function init() {
+    if (window.Session && typeof Session.onUpdate === 'function') {
+      Session.onUpdate(Live._onSessionUpdate);
+    }
+    Live._updateBleDots();
+  }
+
+  /* ---------- Callback de mise à jour de séance ---------- */
+  function _onSessionUpdate(state) {
+    if (!state) return;
+
+    var el;
+
+    el = document.getElementById('live-hr');
+    if (el) el.textContent = state.hr || '--';
+
+    el = document.getElementById('live-pace');
+    if (el) el.textContent = state.pace ? fmtPace(state.pace) : "--'--\"";
+
+    el = document.getElementById('live-speed');
+    if (el) el.textContent = state.speed ? state.speed.toFixed(1) : '0.0';
+
+    el = document.getElementById('live-dist');
+    if (el) el.textContent = fmtDist(state.distance);
+
+    el = document.getElementById('live-cadence');
+    if (el) el.textContent = state.cadence || '0';
+
+    el = document.getElementById('live-calories');
+    if (el) el.textContent = state.calories || '0';
+
+    el = document.getElementById('live-elapsed');
+    if (el) el.textContent = fmtDur(state.duration);
+
+    // Anneau FC : arc + couleur de zone
+    var zone = getZone(state.hr, state.profile);
+    var arc = document.getElementById('hr-ring-arc');
+    if (arc) {
+      var max = computeFcmax(state.profile);
+      var pct = state.hr ? Math.min(1, state.hr / max) : 0;
+      var circumference = 2 * Math.PI * 60; // r=60
+      arc.style.strokeDashoffset = circumference * (1 - pct);
+      arc.style.stroke = zone ? zone.color : 'var(--accent)';
+    }
+
+    // Badge de zone
+    var badge = document.getElementById('live-zone-badge');
+    if (badge) {
+      if (zone && state.hr > 0) {
+        badge.textContent = zone.name;
+        badge.style.display = '';
+        badge.style.background = zone.dimColor;
+        badge.style.color = zone.color;
+      } else {
+        badge.style.display = 'none';
+      }
+    }
+
+    // Minuteur de séance / bannière / bouton
+    var timerDisplay = document.getElementById('session-timer-display');
+    var banner = document.getElementById('session-banner');
+    var btn = document.getElementById('btn-session');
+    var subtitle = document.getElementById('live-subtitle');
+
+    if (state.active) {
+      if (timerDisplay) timerDisplay.textContent = fmtDur(state.duration);
+      if (banner) banner.style.display = '';
+      if (btn) {
+        btn.textContent = state.paused ? '▶ Reprendre' : '⏸ Pause';
+        btn.style.background = 'var(--energy)';
+      }
+      if (subtitle) subtitle.textContent = 'Séance en cours…';
+    } else {
+      if (banner) banner.style.display = 'none';
+      if (btn) {
+        btn.textContent = '▶ Démarrer la séance';
+        btn.style.background = '';
+      }
+      if (subtitle) subtitle.textContent = 'Connectez un capteur pour démarrer';
+    }
+
+    // Pastilles BLE
+    Live._updateBleDots();
+  }
+
+  /* ---------- Type de séance ---------- */
+  function setType(type) {
+    window._sessionType = type;
+    var t = document.getElementById('type-treadmill');
+    var o = document.getElementById('type-outdoor');
+    if (t) t.classList.toggle('active', type === 'treadmill');
+    if (o) o.classList.toggle('active', type === 'outdoor');
+  }
+
+  /* ---------- Démarrer / Pause / Reprendre ---------- */
+  async function toggleSession() {
+    var state = Session.getState();
+    if (state.active) {
+      if (state.paused) {
+        Session.resume();
+      } else {
+        Session.pause();
+      }
+    } else {
+      await Session.start(window._sessionType || 'treadmill');
+    }
+  }
+
+  /* ---------- Arrêter la séance ---------- */
+  async function stopSession() {
+    var state = Session.getState();
+    if (state && state.duration > 30) {
+      var ok = window.confirm('Terminer et enregistrer la séance ?');
+      if (!ok) return;
+    }
+    var summary = await Session.stop();
+    if (summary) {
+      APP.showToast(
+        'Séance enregistrée ! ' + fmtDist(summary.distance_m) + ' km en ' + fmtDur(summary.duration_s),
+        'success'
+      );
+      APP.navigate('history');
+    }
+  }
+
+  /* ---------- Pastilles et libellés BLE ---------- */
+  function _updateBleDots() {
+    if (!window.BT || !BT.state) return;
+    var bt = BT.state;
+
+    var hrDot = document.getElementById('ble-hr-dot');
+    if (hrDot) hrDot.classList.toggle('connected', !!bt.hrConnected);
+
+    var tDot = document.getElementById('ble-treadmill-dot');
+    if (tDot) tDot.classList.toggle('connected', !!bt.treadmillConnected);
+
+    var hrLabel = document.getElementById('ble-hr-label');
+    if (hrLabel) hrLabel.textContent = bt.hrConnected ? 'FC connectée' : 'Cardio';
+
+    var tLabel = document.getElementById('ble-treadmill-label');
+    if (tLabel) tLabel.textContent = bt.treadmillConnected ? 'Tapis connecté' : 'Tapis roulant';
+
+    var btnHr = document.getElementById('btn-connect-hr');
+    if (btnHr) btnHr.textContent = bt.hrConnected ? 'Déconnecter' : 'Connecter';
+
+    var btnT = document.getElementById('btn-connect-treadmill');
+    if (btnT) btnT.textContent = bt.treadmillConnected ? 'Déconnecter' : 'Connecter';
+  }
+
+  window.Live = {
+    init: init,
+    setType: setType,
+    toggleSession: toggleSession,
+    stopSession: stopSession,
+    _updateBleDots: _updateBleDots,
+    _onSessionUpdate: _onSessionUpdate
+  };
+})();
