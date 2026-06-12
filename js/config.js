@@ -126,6 +126,7 @@ window.getZone = function(hr, profile) {
   if (!hr || hr <= 0) return null;
   const max = window.computeFcmax(profile);
   const pct = hr / max;
+  if (pct < CONFIG.zones[0].pctMin) return null;   // below zone 1 → no badge
   return CONFIG.zones.find(z => pct >= z.pctMin && pct < z.pctMax) || CONFIG.zones[4];
 };
 
