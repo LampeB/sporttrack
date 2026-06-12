@@ -1,7 +1,7 @@
 window.CONFIG = {
   supabase: {
-    url: localStorage.getItem('st_supabase_url') || '',
-    anonKey: localStorage.getItem('st_supabase_key') || '',
+    url: 'https://wrgjvvivrhkofcxzwung.supabase.co',
+    anonKey: 'sb_publishable_jbH64mc4IwA3V7yDQHj5YA_P6ADUq7D',
   },
   zones: [
     { id: 'r', name: 'Repos',        pctMin: 0.00, pctMax: 0.40, color: 'var(--zr)', dimColor: 'var(--zr-dim)' },

@@ -30,13 +30,6 @@
       if (APP._theme === 'light') document.body.classList.add('light');
       document.getElementById('theme-toggle')?.classList.toggle('on', APP._theme === 'light');
 
-      // Premier lancement : si Supabase n'est pas configuré,
-      // afficher le formulaire de configuration sur l'écran d'auth
-      APP._checkSupabaseConfig();
-
-      // Liaison des boutons globaux (hors onclick inline de l'HTML)
-      APP._bindNav();
-
       // Init de l'authentification — garde d'accès à l'application
       try {
         await Auth.init(APP._onAuthChange);
@@ -68,41 +61,6 @@
     async _onLoggedIn() {
       // Naviguer vers la section par défaut
       APP.navigate('live');
-    },
-
-    /* ----------------------------------------------------------
-     * Configuration Supabase (premier lancement)
-     * -------------------------------------------------------- */
-
-    _checkSupabaseConfig() {
-      const url = localStorage.getItem('st_supabase_url');
-      const key = localStorage.getItem('st_supabase_key');
-      const configSection = document.getElementById('auth-supabase-config');
-      if (!configSection) return;
-      configSection.style.display = (!url || !key) ? '' : 'none';
-    },
-
-    saveSupabaseConfig() {
-      const url = document.getElementById('sb-url-input')?.value.trim();
-      const key = document.getElementById('sb-key-input')?.value.trim();
-      if (!url || !key) {
-        APP.showToast('URL et clé requis', 'error');
-        return;
-      }
-      localStorage.setItem('st_supabase_url', url);
-      localStorage.setItem('st_supabase_key', key);
-
-      // Mettre à jour CONFIG et réinitialiser le client DB
-      CONFIG.supabase.url = url;
-      CONFIG.supabase.anonKey = key;
-      DB.reinit();
-
-      const configSection = document.getElementById('auth-supabase-config');
-      if (configSection) configSection.style.display = 'none';
-      APP.showToast('Supabase configuré !', 'success');
-
-      // Relancer l'init de l'authentification
-      Auth.init(APP._onAuthChange);
     },
 
     /* ----------------------------------------------------------
@@ -159,12 +117,6 @@
 
     refresh() {
       APP._initSection(APP.currentSection);
-    },
-
-    _bindNav() {
-      // Les items de navigation ont déjà des onclick inline dans l'HTML.
-      // On se contente ici du bouton de config Supabase.
-      document.getElementById('sb-config-save')?.addEventListener('click', APP.saveSupabaseConfig);
     },
 
     /* ----------------------------------------------------------
