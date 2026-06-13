@@ -129,6 +129,23 @@
     }
     _wasActive = !!state.active;
 
+    // GPS status (outdoor panel)
+    if (state.type === 'outdoor' && window.GPS) {
+      var gDot = document.getElementById('live-gps-dot');
+      var gLabel = document.getElementById('live-gps-label');
+      var gps = GPS.state;
+      if (gDot) gDot.classList.toggle('connected', !!gps.active && !gps.paused);
+      if (gLabel) {
+        if (!gps.active) gLabel.textContent = 'GPS inactif — démarrez une séance';
+        else if (gps.paused) gLabel.textContent = 'Auto-pause GPS';
+        else gLabel.textContent = gps.accuracy != null ? 'GPS ±' + gps.accuracy + ' m' : 'Recherche GPS…';
+      }
+      el = document.getElementById('live-elevation');
+      if (el) el.textContent = state.elevation ? Math.round(state.elevation) : '--';
+      el = document.getElementById('live-splits-count');
+      if (el) el.textContent = (gps.splits && gps.splits.length) ? gps.splits.length : '0';
+    }
+
     // Pastilles BLE
     Live._updateBleDots();
   }
@@ -144,8 +161,23 @@
   }
 
   function _refreshPanel() {
-    var panel = document.getElementById('live-treadmill-panel');
-    if (panel) panel.style.display = (window._sessionType === 'treadmill') ? '' : 'none';
+    var isOutdoor = window._sessionType === 'outdoor';
+
+    var tPanel = document.getElementById('live-treadmill-panel');
+    if (tPanel) tPanel.style.display = isOutdoor ? 'none' : '';
+
+    var oPanel = document.getElementById('live-outdoor-panel');
+    if (oPanel) {
+      oPanel.style.display = isOutdoor ? '' : 'none';
+      if (isOutdoor && window.GPS) {
+        // Leaflet needs the container visible before init
+        setTimeout(function () { GPS.initMap('live-map'); }, 50);
+        // Request GPS permission early so the prompt appears before session start
+        if (navigator.geolocation) {
+          navigator.geolocation.getCurrentPosition(function () {}, function () {});
+        }
+      }
+    }
   }
 
   /* ---------- Démarrer / Pause / Reprendre ---------- */

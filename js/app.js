@@ -90,6 +90,7 @@
       if (APP._initialized[section]) {
         // Recharger les données lors d'une nouvelle visite
         switch (section) {
+          case 'live': Live._refreshPanel(); break;
           case 'history': History.load(); break;
           case 'goals': Goals.load(); break;
           case 'settings': Settings.load(); break;

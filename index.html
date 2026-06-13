@@ -256,9 +256,21 @@
         <div style="display:flex;gap:8px;align-items:center">
           <span style="font-size:13px;color:var(--text-2)">Type :</span>
           <button class="btn btn-ghost session-type-btn active" id="type-treadmill" onclick="Live.setType('treadmill')">🏃 Tapis</button>
-          <button class="btn btn-ghost session-type-btn" id="type-outdoor" onclick="Live.setType('outdoor');APP.navigate('outdoor')">🌿 Outdoor</button>
+          <button class="btn btn-ghost session-type-btn" id="type-outdoor" onclick="Live.setType('outdoor')">🌿 Outdoor</button>
         </div>
         <button class="btn btn-primary btn-lg" id="btn-session" onclick="Live.toggleSession()">▶ Démarrer la séance</button>
+      </div>
+      <!-- Outdoor inline panel (shown when type = outdoor) -->
+      <div id="live-outdoor-panel" style="margin-top:12px;display:none">
+        <div id="live-map" style="width:100%;height:200px;border-radius:var(--radius);overflow:hidden;margin-bottom:10px"></div>
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+          <span class="ble-dot" id="live-gps-dot"></span>
+          <span id="live-gps-label" style="font-size:13px;color:var(--text-2)">GPS inactif — démarrez une séance</span>
+        </div>
+        <div class="card-grid" style="grid-template-columns:repeat(2,1fr)">
+          <div class="stat-card"><span class="val" id="live-elevation">--</span><span class="lbl">Altitude (m)</span></div>
+          <div class="stat-card"><span class="val" id="live-splits-count">0</span><span class="lbl">Splits</span></div>
+        </div>
       </div>
       <!-- Treadmill inline panel (shown when type = treadmill) -->
       <div id="live-treadmill-panel" style="margin-top:12px">
